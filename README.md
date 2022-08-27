@@ -12,6 +12,20 @@ From the Terminal in the root folder, type python main_menu.py From there you ca
 - NEAT 
 - pygame
 
+# Main Files
+- main_menu.py This is the menu where the different agents and training can be accessed
+- myQ_flappy_bird.py The flappy bird game adapted for the q-learning bot
+- qbot.py My attempt at building a q-learning agent
+- config_neat.txt The configuration file for the GA's inital genomes
+- genetic_alg.py The implementation of the GA using the NEAT library
+- rlbot_flappy.py and bot.py The implmentation from chncyhn
+
+# Support Files
+-data This file is for the implementation of q-learning by chncyhn
+- imga The images of the birds, pipes, background and pipes
+- MyEnv The virutal environment, already set up (hopefully) for running this project so others can just plug and play
+
+
 # Credits 
 -The q learning bot ( under myQ_flappy_bird.py and q_bot ) was inspired by the worl found here <https://github.com/chncyhn/flappybird-qlearning-bot>
 
