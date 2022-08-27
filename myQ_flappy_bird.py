@@ -58,8 +58,6 @@ def draw_window(win, bird, pipes, ground, score): # takes the window and objects
 
 
 ##### Q TABLE BOT STUFF #########
-
-
 def updateQtable(score):
     global NEXT_UPDATE_TIME
 
@@ -69,12 +67,6 @@ def updateQtable(score):
         justUpdate = True
         NEXT_UPDATE_TIME = getNextUpdateTime()
 
-    
-    # if bot.gameCNT >= EPISODE:
-    #     if not justUpdate: bot.dump_qvalues(force=True)
-    #     showPerformance()
-    #     pygame.quit()
-    #     sys.exit()
 
 #####END Q TABLE BOT STUFF #########
 
@@ -94,6 +86,7 @@ def main():
     # first_jump = True
 
     run = True # bool for while loop 
+
     # Game loop
     while run:
         clock.tick(30) # tick 30 times a second
@@ -101,10 +94,16 @@ def main():
         for event in pygame.event.get(): # get the events happening via pygame method
             if event.type == pygame.QUIT: # check if we quit the game
                 run = False
+                break
             # detect if space bar was pressed
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     bird.jump() 
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
+                    break
 
         
         # keep track of if we need to add a pipe or not
@@ -124,13 +123,11 @@ def main():
                 bot.update_scores(died=True)
                 updateQtable(score)
 
-                main()
+                #main()
 
-                # run = False
-                # break
+                run = False
+                break
 
-                # pygame.quit()
-                # quit()
 
             if bot.act(bird.x, bird.y, bird.vel, pipes):
                 bird.jump() 
@@ -161,13 +158,10 @@ def main():
             updateQtable(score)
             #run = False
 
-            main()
+            #main()
 
-            # run = False
-            # break
-
-            # pygame.quit()
-            # quit()
+            run = False
+            break
 
          # Check if bird has hit the ground
         if bird.y + bird.img.get_height() < 0:
@@ -176,21 +170,38 @@ def main():
             updateQtable(score)
             #run = False
 
-            main()
+            #main()
 
-            # run = False
-            # break
-
-            # pygame.quit()
-            # quit()
+            run = False
+            break
 
         # Treadmill the ground and draw objects to the window
         ground.move()
         draw_window(win, bird, pipes, ground, score)
 
     # If while loop exited, quit pygame
-    pygame.quit()
+    #pygame.quit()
     #quit()
+
+def game():
+     for i in range(5):
+        for event in pygame.event.get(): # get the events happening via pygame method
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        print("Escape")
+                        #game_run = False
+                        break
+        main()
+
+    
+    
+         
+
+    
+        
+
+
+
 
 
 #### MAIN LOOP #####
@@ -206,7 +217,6 @@ def noui():
 
     score = 0 # Keep track of that score
 
-    # first_jump = True
 
     run = True # bool for while loop 
     # Game loop
@@ -233,20 +243,14 @@ def noui():
         for pipe in pipes:
 
             if pipe.collide(bird):
-                # Restart the game if collision 
-                #print("Collision!")
+                # Break the loop if collision 
                 print("Game " + str(bot.gameCNT+1) + ": reach " + str(score) + "...")
                 bot.update_scores(died=True)
                 updateQtable(score)
 
-                #main()
-
                 run = False
-                break
-
-                # pygame.quit()
-                # quit()
-
+                break    
+            # If the q table is 1
             if bot.act(bird.x, bird.y, bird.vel, pipes):
                 bird.jump() 
             
@@ -274,25 +278,15 @@ def noui():
             print("Game " + str(bot.gameCNT+1) + ": reach " + str(score) + "...")
             bot.update_scores(died = True)
             updateQtable(score)
-            #run = False
-
-            #main()
 
             run = False
             break
-
-            # pygame.quit()
-            # quit()
 
          # Check if bird has hit the ground
         if bird.y + bird.img.get_height() < 0:
             print("Game " + str(bot.gameCNT+1) + ": reach " + str(score) + "...")
             bot.update_scores(died = True)
             updateQtable(score)
-            #run = False
-
-            #main()
-
             run = False
             break
 
@@ -304,15 +298,7 @@ def noui():
         #draw_window(win, bird, pipes, ground, score)
 
     # If while loop exited, quit pygame
-    pygame.quit()
+    #pygame.quit()
     #quit()
 
-main()
-
-# for i in range(1000):
-#     noui()
-
-#quit()
-
-# for i in range(5):
-#     main()
+# main() # only when stand alone

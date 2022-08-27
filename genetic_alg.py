@@ -6,6 +6,13 @@ from Bird import Bird
 from Pipe import Pipe
 from Ground import Ground 
 import pickle
+
+### Setting up csv file to write ###
+import csv
+
+data = []
+
+
 #from main_menu import *
 # Get font for writing to screen 
 pygame.font.init()
@@ -73,7 +80,7 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
 
     #### END NEURAL NETWORK SET UP CODE ####
 
-    base = Ground(730) # Make the ground
+    ground = Ground(730) # Make the ground
     pipes = [Pipe(600)] # List of pipes; 600 ideal diffulty after testing
     win = pygame.display.set_mode((screen_width, screen_height)) # create a window object with out width and height
     clock = pygame.time.Clock() # create a clock object to set the ticks per second
@@ -87,10 +94,10 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
         clock.tick(30) # tick 30 times a second
         for event in pygame.event.get(): # get the events happening via pygame method
             if event.type == pygame.QUIT: # check if we quit the game
-                #run = False
-                #break
-                pygame.quit()
-                quit()
+                run = False
+                break
+                #pygame.quit()
+                #quit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -101,18 +108,18 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
 
 
         ##### NEURAL NETWORK NEAT CODE #####
-        ### Deicing which pipe the birds should be looking at ###
+        ### Deciding which pipe the birds should be looking at ###
         pipe_ind = 0 # Start with an index of 0
         if len(birds) > 0:
             # if the bird is past the first pipe look at the second
-            # (there shouldn't be more than two pipes on the scrrn)
+            # (there shouldn't be more than two pipes on the screen)
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].top_pipe.get_width():
                 pipe_ind = 1
             # Othrwise we have no more birds
         else:
             run = False
             # out put the score and the generation when a population dies
-            print(score, gen)
+            print("Score: " + str(score), "Generation: " + str(gen))
             break
 
         for x, bird in enumerate(birds):
@@ -124,6 +131,7 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
             # config file is set up with only 1, but more can be added
             output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
+            # If the neuron is activated more than 0.5, jump
             if output[0] > 0.5:
                 bird.jump()
 
@@ -149,7 +157,8 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
             # Check if pipe moved off screen and remove
             if pipe.x + pipe.top_pipe.get_width() < 0:
                 pass
-
+            
+            # Move the pipes forward
             pipe.move()
 
         # If we passed a pipe add to score and add a new point
@@ -172,18 +181,16 @@ def eval_genomes(genomes, config): # we pass it genomes and the config object to
                 nets.pop(x) # remove nerual network
                 ge.pop(x) # remove genome
 
-        if score >= 100:
+        if score >= 1000:
             run = False
             break
 
+        # Move the ground, draw the window
+        ground.move()
+        draw_window(win, birds, pipes, ground, score)
 
-        base.move()
-        draw_window(win, birds, pipes, base, score)
-
-    # If while loop exited, quit pygame
-    #pygame.quit() #Moved to event in beigning of while run loop
-    #quit()
-
+    #print(gen, score)
+    data.append([gen, score])
 
 
 def run(config_path):
@@ -205,12 +212,21 @@ def run(config_path):
     
     # Runs NEAT’s genetic algorithm for at most n generations and save the winner
     winner = p.run(eval_genomes, 5)
-    with open("winner.pkl", "wb") as f:
-        pickle.dump(winner, f)
-        f.close()
+
+    # Get the previous winner
+    with open("winner.pkl", "rb") as f:
+        prev_winner = pickle.load(f)
+        f.close
+    
+    # If the new winner did better, save him
+    if prev_winner.fitness < winner.fitness:
+        print("New Winner!!")
+        with open("winner.pkl", "wb") as f:
+            pickle.dump(winner, f)
+            f.close()
+
     # show final stats
-    print('\nBest genome:\n{!s}'.format(winner)) 
-    print("Gen: " + str(gen))
+    print('\nBest genome:\n{!s}'.format(winner))
 
 def replay_genome(config_path, genome_path="winner.pkl"):
     # Load requried NEAT config
@@ -225,8 +241,21 @@ def replay_genome(config_path, genome_path="winner.pkl"):
 
     # Call game with only the loaded genome
     eval_genomes(genomes, config)
+    
 
 def geneticAlgo():
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config_neat.txt")
     run(config_path)
+
+    header = ['Generation', 'Score']
+
+    with open('Scores.csv', 'w', encoding='UTF8', newline='') as file:
+        writer = csv.writer(file)
+
+        # write the header
+        writer.writerow(header)
+        writer.writerows(data)
+        file.close() 
+
+   

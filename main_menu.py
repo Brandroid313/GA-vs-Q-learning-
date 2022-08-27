@@ -1,6 +1,6 @@
 import genetic_alg
 import rlbot_flappy
-#import myQ_flappy_bird
+import myQ_flappy_bird
 import keyboard
 
 ### DRAW BACKGROUND ####
@@ -26,7 +26,7 @@ SCREEN_HEIGHT = 800
 background_img = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
 
 # Set the font for the screen
-fonts = pygame.font.SysFont("arial", 30) 
+fonts = pygame.font.SysFont("arial", 25) 
 
 ### DRAW THE ANIMATION ###
 def draw_window(win, bird, ground): # takes the window and objects to be drawn
@@ -40,21 +40,25 @@ def draw_window(win, bird, ground): # takes the window and objects to be drawn
     win.blit(background_img, (0,0)) # Draw the backgroound at 0, 0
 
     # Welcome text
-    title_text = fonts.render("Welcome to The GA vs DQN!", 1, (255, 255, 255))
+    title_text = fonts.render("Welcome to The GA vs Q-learning!", 1, (255, 255, 255))
     # draw it to the window; use width to keep track of how big the number gets
     win.blit(title_text, (SCREEN_WIDTH * .9  - title_text.get_width(), 50))
 
     option_text_1 = fonts.render("Press 1 to run GA training", 1, (255, 255, 255))
     # draw it to the window; use width to keep track of how big the number gets
-    win.blit(option_text_1, (SCREEN_WIDTH* .9  - option_text_1.get_width(), 100))
+    win.blit(option_text_1, (SCREEN_WIDTH* .65  - option_text_1.get_width(), 100))
 
     option_text_2 = fonts.render("Press 2 to run best GA bird", 1, (255, 255, 255))
     # draw it to the window; use width to keep track of how big the number gets
-    win.blit(option_text_2, (SCREEN_WIDTH * .9  - option_text_2.get_width(), 150))
+    win.blit(option_text_2, (SCREEN_WIDTH * .65  - option_text_2.get_width(), 150))
 
-    option_text_3 = fonts.render("Press 3 to run best adapted Q bird", 1, (255, 255, 255))
+    option_text_3 = fonts.render("Press 3 to run best adapted Q bird 5 times", 1, (255, 255, 255))
     # draw it to the window; use width to keep track of how big the number gets
-    win.blit(option_text_3, (SCREEN_WIDTH * .9  - option_text_2.get_width(), 200))
+    win.blit(option_text_3, (SCREEN_WIDTH * .65  - option_text_2.get_width(), 200))
+
+    option_text_4 = fonts.render("Press 4 to run third party q bird", 1, (255, 255, 255))
+    # draw it to the window; use width to keep track of how big the number gets
+    win.blit(option_text_4, (SCREEN_WIDTH * .65  - option_text_2.get_width(), 250))
 
     ground.draw(win)
 
@@ -94,17 +98,20 @@ def main_menu():
                     local_dir = os.path.dirname(__file__)
                     genetic_alg.replay_genome(os.path.join(local_dir, "config_neat.txt"))
 
-            # if number 1 pressed, start the genetic Algorithm
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_3:
-                    rlbot_flappy.game()
-                    win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) 
 
              # if number 1 pressed, start the genetic Algorithm
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_3:
+                    #pass
+                    myQ_flappy_bird.game()
+
+            # if number 1 pressed, start the genetic Algorithm
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_4:
-                    pass
-                    #myQ_flappy_bird.main()
+                    rlbot_flappy.game()
+                    win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) 
+
+            
 
 
         # Treadmill the ground and draw objects to the window
